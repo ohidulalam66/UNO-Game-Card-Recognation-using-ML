@@ -1,97 +1,67 @@
-# 🃏 UNO Game Card Recognition using YOLOv8
+# UNO Game Card Recognition using YOLOv8
 
 ## Overview
-This project trains a YOLOv8 object detection model to recognize UNO game cards from images. The notebook provides an end-to-end workflow, from dataset preparation to model training, saving, and inference.
+This project trains a YOLOv8 object detection model to recognize UNO game cards from images. The notebook covers the complete workflow:
 
----
+- Dataset extraction and preparation
+- Automatic generation of `data.yaml`
+- YOLOv8 training using Ultralytics
+- Saving trained weights to Google Drive
+- Loading the trained model
+- Running inference on uploaded images
+- Visualizing detection results
 
-## Project Workflow
+## Notebook Workflow
 
-```mermaid
-flowchart TD
-    A[Start] --> B[Mount Google Drive]
-    B --> C[Install Ultralytics YOLOv8]
-    C --> D[Extract UNO Dataset ZIP]
-    D --> E[Locate Images & Labels]
-    E --> F[Load Classes and Create data.yaml]
-    F --> G[Load YOLOv8n Pretrained Model]
-    G --> H[Train Model]
-    H --> I[Save Training Results]
-    I --> J[Backup best.pt and last.pt]
-    J --> K[Load Trained Model]
-    K --> L[Run Inference on New Images]
-    L --> M[Display Card Detection Results]
-    M --> N[End]
+### 1. Connect Google Drive
+The notebook mounts Google Drive to:
+- Access datasets
+- Save training outputs
+- Store trained model weights
+
+### 2. Install Dependencies
+The project uses:
+
+```bash
+pip install ultralytics
 ```
 
----
+Main libraries:
+- Ultralytics YOLOv8
+- OpenCV
+- Matplotlib
+- Google Colab utilities
 
-## Features
-
-- Automatic dataset extraction
-- Automatic image and label discovery
-- Dynamic `data.yaml` generation
-- YOLOv8 Nano model training
-- Google Drive integration
-- Model checkpoint backup
-- UNO card detection and inference
-
----
-
-## Project Structure
-
-```text
-project/
-│
-├── UNo_Game_Card_Recognation_Notebook.ipynb
-├── README.md
-│
-├── dataset/
-│   ├── images/
-│   ├── labels/
-│   └── classes.txt
-│
-├── data.yaml
-│
-└── weights/
-    ├── best.pt
-    └── last.pt
-```
-
----
-
-## Training Pipeline
-
-### 1. Mount Google Drive
-
-```python
-from google.colab import drive
-drive.mount('/content/drive')
-```
-
-### 2. Install YOLOv8
-
-```python
-!pip install ultralytics -q
-```
-
-### 3. Extract Dataset
-
-```python
-import zipfile
-zip_ref.extractall(extract_path)
-```
-
-### 4. Create YOLO Configuration
-
+### 3. Dataset Preparation
 The notebook:
 
-- Finds image folders
-- Finds label folders
-- Loads class names
-- Generates `data.yaml`
+1. Extracts a ZIP dataset.
+2. Locates image and label directories.
+3. Loads class names from `classes.txt`.
+4. Creates a YOLO-compatible `data.yaml` configuration file.
 
-### 5. Train Model
+Expected dataset structure:
+
+```text
+dataset/
+├── images/
+├── labels/
+└── classes.txt
+```
+
+### 4. Model Training
+
+Training configuration:
+
+| Parameter | Value |
+|-----------|--------|
+| Model | YOLOv8 Nano (`yolov8n.pt`) |
+| Epochs | 120 |
+| Image Size | 640 |
+| Batch Size | 8 |
+| Patience | 25 |
+
+Example:
 
 ```python
 from ultralytics import YOLO
@@ -99,7 +69,7 @@ from ultralytics import YOLO
 model = YOLO("yolov8n.pt")
 
 model.train(
-    data="/content/data.yaml",
+    data="data.yaml",
     epochs=120,
     imgsz=640,
     batch=8,
@@ -107,43 +77,15 @@ model.train(
 )
 ```
 
----
+### 5. Saving Model Weights
 
-## Training Configuration
+The notebook saves:
+- `best.pt` (best-performing model)
+- `last.pt` (latest checkpoint)
 
-| Parameter | Value |
-|------------|--------|
-| Model | YOLOv8n |
-| Epochs | 120 |
-| Image Size | 640 |
-| Batch Size | 8 |
-| Patience | 25 |
+to Google Drive for future use.
 
----
-
-## Saving Model
-
-The notebook stores:
-
-- `best.pt` → Best performing model
-- `last.pt` → Latest checkpoint
-
-Google Drive is used for permanent storage and backup.
-
----
-
-## Inference Workflow
-
-```mermaid
-flowchart LR
-    A[Test Image] --> B[Load Trained Model]
-    B --> C[YOLO Prediction]
-    C --> D[Detect UNO Cards]
-    D --> E[Draw Bounding Boxes]
-    E --> F[Display Results]
-```
-
-### Load Model
+### 6. Model Loading
 
 ```python
 from ultralytics import YOLO
@@ -151,38 +93,50 @@ from ultralytics import YOLO
 model = YOLO("best.pt")
 ```
 
-### Predict
+### 7. UNO Card Detection
+
+The trained model can perform inference on uploaded images:
 
 ```python
 results = model.predict(
-    source="test_image.jpg",
+    source="image.jpg",
     conf=0.25
 )
 ```
 
----
+Features:
+- Upload image through Google Colab
+- Detect UNO cards
+- Display bounding boxes
+- Show predicted card classes
+- Print detection details
 
 ## Requirements
 
-```bash
-pip install ultralytics
-pip install opencv-python
-pip install matplotlib
+```text
+ultralytics
+opencv-python
+matplotlib
 ```
 
----
+## Running the Project
+
+1. Open the notebook in Google Colab.
+2. Mount Google Drive.
+3. Upload or connect the UNO dataset.
+4. Run all cells sequentially.
+5. Train the model.
+6. Save the generated weights.
+7. Upload test images and perform inference.
 
 ## Output
 
-After training, the project generates:
+The trained model produces:
 
-- Trained YOLOv8 weights
-- Detection predictions
-- Bounding box visualizations
-- Training metrics and logs
+- YOLOv8 weights (`best.pt`, `last.pt`)
+- Training logs and metrics
+- UNO card detection results on custom images
 
----
+## Project Goal
 
-## Objective
-
-Develop a computer vision system capable of automatically recognizing UNO game cards using YOLOv8 object detection.
+Build an object detection model capable of recognizing UNO cards from images using YOLOv8, enabling automated card identification for computer vision applications and game-related projects.
